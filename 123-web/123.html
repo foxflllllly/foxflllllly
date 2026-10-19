@@ -1,0 +1,66 @@
+import tkinter as tk
+from tkinter import messagebox
+
+# State control for flashing
+is_red = False
+
+def flash_screen():
+    """Flashes the background between black and dark red"""
+    global is_red
+    if is_red:
+        root.configure(bg="black")
+        label.config(bg="black", fg="darkred")
+        entry.config(bg="black", fg="darkred", insertbackground="darkred")
+        death_label.config(bg="black", fg="red")
+    else:
+        root.configure(bg="darkred")
+        label.config(bg="darkred", fg="black")
+        entry.config(bg="darkred", fg="black", insertbackground="black")
+        death_label.config(bg="darkred", fg="black")
+    
+    is_red = not is_red
+    # Flash every 500ms (0.5 seconds) to avoid triggering photosensitive epilepsy
+    root.after(500, flash_screen)
+
+def check_password(event=None):
+    password = entry.get()
+    if password == "123":
+        messagebox.showinfo("ACCESS GRANTED", "You survived... this time.")
+        root.destroy()
+    else:
+        # Wrong password: clear input and show giant DEATH
+        entry.delete(0, tk.END)
+        
+        death_label.config(text="DEATH")
+        death_label.place(relx=0.5, rely=0.5, anchor="center") 
+        death_label.lift() 
+
+# Create main window
+root = tk.Tk()
+root.title("SYSTEM LOCKED")
+root.attributes("-fullscreen", True) 
+root.attributes("-topmost", True)    
+
+# Main label (no password hint)
+label = tk.Label(root, text="SYSTEM LOCKED\n\nEnter Passcode:", 
+                 font=("Courier", 30, "bold"), fg="darkred", bg="black")
+label.pack(pady=150)
+
+# Password entry box
+entry = tk.Entry(root, font=("Courier", 30), show="*", justify="center", 
+                 bg="black", fg="darkred", insertbackground="darkred")
+entry.pack(pady=20)
+entry.focus_set()
+
+# Giant DEATH label (initially hidden)
+death_label = tk.Label(root, text="", font=("Impact", 150, "bold"), 
+                       fg="red", bg="black")
+
+# Bind Enter key
+root.bind("<Return>", check_password)
+
+# Start flashing
+flash_screen()
+
+# Run application
+root.mainloop()
